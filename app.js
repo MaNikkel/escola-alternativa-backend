@@ -4,6 +4,10 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const multer = require("multer");
+const cors = require("cors");
+// internal imports
+const authRoutes = require("./routes/authRoutes");
+const authMiddleware = require("./middlewares/authMiddleware");
 
 // defines an app
 const app = express();
@@ -15,19 +19,24 @@ const URL =
   "mongodb+srv://mnikkel-dev:mnikkel-dev-2020@db-escola-kw8fa.mongodb.net/escola-dev?retryWrites=true&w=majority";
 
 // allow CORS
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
+app.use(cors());
 
 app.get("/", (req, res, next) => {
   res.status(200).json({
     message: "server listening!"
+  });
+});
+
+// uses the body parser for an api
+app.use(bodyParser.json());
+
+// app routes
+app.use("/auth", authRoutes);
+
+// auth test
+app.get("/auth-test", authMiddleware, (req, res, next) => {
+  res.status(200).json({
+    message: "You are authorized"
   });
 });
 
